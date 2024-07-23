@@ -57,11 +57,11 @@ var installDependencies = function(packageManager, frontendPath, dependencies, d
     var spinner = ora('Installing dependencies...').start();
     if (dependencies.length > 0) {
         spinner.text = 'Installing dependencies: ' + dependencies.join(', ');
-        execSync(installCommand(dependencies), { cwd: frontendPath, stdio: 'inherit' });
+        execSync(installCommand(dependencies), { cwd: frontendPath, stdio: 'pipe' });
     }
     if (devDependencies.length > 0) {
         spinner.text = 'Installing dev dependencies: ' + devDependencies.join(', ');
-        execSync(installCommand(devDependencies, true), { cwd: frontendPath, stdio: 'inherit' });
+        execSync(installCommand(devDependencies, true), { cwd: frontendPath, stdio: 'pipe' });
     }
     spinner.succeed(chalk.green('Dependencies installed successfully'));
 };
