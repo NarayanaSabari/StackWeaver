@@ -1,10 +1,9 @@
 const express = require('express');
-const { verifyToken } = require('@middleware/verifyToken');
 
 // Creating an app instance
 const app = express.Router();
 
-const appService = require('@controller/app.service.js');
+const appService = require('@services/app.service');
 
 app.get('/', (req, res) => {
     res.json({ connectionStatus: 'API/app connected' });
