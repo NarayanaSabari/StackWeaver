@@ -1,6 +1,6 @@
 {
   "name": "stackweaver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "StackWeaver is an innovative CLI tool designed to streamline the initial setup of full-stack MERN applications.",
   "main": "index.js",
   "bin": {
