@@ -14,8 +14,8 @@ const generateBackend = async (projectPath, options) => {
     version: '1.0.0',
     main: 'server.js',
     scripts: {
-      start: 'node server.js',
-      dev: 'nodemon server.js'
+      start: 'node ./src/server.js',
+      dev: "nodemon ./src/server.js"
     },
     _moduleAliases: {
     "@": "./src/",

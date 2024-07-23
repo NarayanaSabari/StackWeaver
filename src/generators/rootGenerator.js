@@ -8,7 +8,7 @@ const generateProject = async (options) => {
   const projectPath = path.join(process.cwd(), options.projectName);
 
   console.log(chalk.blue(`Creating project in ${projectPath}`));
-
+  console.log(options.projectName,options.useTailwind,options.uiLibrary)
   await createProjectStructure(projectPath);
   await generateBackend(projectPath, options);
   await generateFrontend(projectPath, options);
