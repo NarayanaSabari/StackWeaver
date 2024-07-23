@@ -3,19 +3,21 @@ const express = require('express');
 const cors = require('cors');
 const route = require('@routes/routes');
 const { connectToDatabase } = require('@mongodb/db')
+const  {logger}  = require('@middleware/logger')
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
+app.use(logger)
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: true, withCredentials: true }));
 
 // Routes
+
 app.use('/api', route);
-app.get('/', (req, res) => {
+app.get('/',(req, res) => {
   res.send('Welcome to Stremix Server-side!'); 
 });
 

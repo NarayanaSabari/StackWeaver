@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 // Importing the app controller using the alias
-const app = require('@controller/app.controller');
+const app = require('@controllers/app.controller');
 
 router.use('/app', app);
 router.get('/', async (req, res) => {
