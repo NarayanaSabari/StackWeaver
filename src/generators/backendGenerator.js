@@ -17,7 +17,18 @@ const generateBackend = async (projectPath, options) => {
       start: 'node server.js',
       dev: 'nodemon server.js'
     },
+    _moduleAliases: {
+    "@": "./src/",
+    "@controllers": "./src/controllers/",
+    "@config": "./src/config/",
+    "@routes": "./src/routes/",
+    "@middleware": "./src/middleware/",
+    "@mongodb": "./src/modules/mongodb",
+    "@utils": "./src/utils",
+    "@services": "./src/services"
+  },
     dependencies: {}
+    
   };
 
   const dependencies = getDependencies(options).backend;
@@ -27,25 +38,25 @@ const generateBackend = async (projectPath, options) => {
 
   await fs.writeJson(path.join(backendPath, 'package.json'), packageJson, { spaces: 2 });
 
-  if (options.useGraphQL) {
-    // Add GraphQL schema and resolvers
-    const graphqlSetup = `
-const { buildSchema } = require('graphql');
+//   if (options.useGraphQL) {
+//     // Add GraphQL schema and resolvers
+//     const graphqlSetup = `
+// const { buildSchema } = require('graphql');
 
-const schema = buildSchema(\`
-  type Query {
-    hello: String
-  }
-\`);
+// const schema = buildSchema(\`
+//   type Query {
+//     hello: String
+//   }
+// \`);
 
-const root = {
-  hello: () => 'Hello, GraphQL!'
-};
+// const root = {
+//   hello: () => 'Hello, GraphQL!'
+// };
 
-module.exports = { schema, root };
-`;
-    await fs.writeFile(path.join(backendPath, 'graphql.js'), graphqlSetup);
-  }
-};
+// module.exports = { schema, root };
+// `;
+//     await fs.writeFile(path.join(backendPath, 'graphql.js'), graphqlSetup);
+//   }
+// };
 
 module.exports = { generateBackend };

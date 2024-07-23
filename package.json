@@ -4,7 +4,7 @@
   "description": "StackWeaver is an innovative CLI tool designed to streamline the initial setup of full-stack MERN applications.",
   "main": "index.js",
     "bin": {
-    "create-mern-app": "./bin/cli.js"
+    "stackweaver": "./bin/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

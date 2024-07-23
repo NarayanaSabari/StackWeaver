@@ -4,7 +4,8 @@ const getDependencies = (options) => {
       'express',
       'mongoose',
       'dotenv',
-      'cors'
+      'cors',
+      'module-alias'
     ],
     frontend: {
       dependencies: [],

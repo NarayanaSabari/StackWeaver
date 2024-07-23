@@ -12,22 +12,15 @@ const getPrompts = () => [
     default: false
   },
   {
-    type: 'confirm',
-    name: 'useShadcn',
-    message: 'Do you want to use Shadcn UI?',
-    default: false
-  },
-  {
-    type: 'confirm',
-    name: 'useDaisyUI',
-    message: 'Do you want to use DaisyUI?',
-    default: false
-  },
-  {
-    type: 'confirm',
-    name: 'useGraphQL',
-    message: 'Do you want to set up GraphQL?',
-    default: false
+    type: 'list',
+    name: 'uiLibrary',
+    message: 'Which UI library would you like to use?',
+    choices: [
+      { name: 'None', value: 'none' },
+      { name: 'Shadcn UI', value: 'shadcn' },
+      { name: 'DaisyUI', value: 'daisyui' }
+    ],
+    default: 'none'
   }
 ];
 
