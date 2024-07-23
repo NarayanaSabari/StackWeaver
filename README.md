@@ -64,10 +64,6 @@ We welcome contributions from the community! If you'd like to contribute, please
 4. Push to the branch (`git push origin feature-branch`)
 5. Open a pull request
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 StackWeaver was inspired by the need for efficient and customizable project scaffolding in the MERN stack ecosystem. Special thanks to all the developers and contributors who have made this project possible.
