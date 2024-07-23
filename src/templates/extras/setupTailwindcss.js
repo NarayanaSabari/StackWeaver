@@ -1,54 +1,68 @@
-const { execSync } = require('child_process');
-const fs = require('fs-extra');
-const path = require('path');
+var execSync = require('child_process').execSync;
+var fs = require('fs-extra');
+var path = require('path');
+var chalk = require('chalk');
+var ora = require('ora');
 
-
-const logStep = (step) => {
-    console.log('\n====================');
-    console.log(step);
-    console.log('====================\n');
+var logStep = function(step) {
+    console.log('\n' + chalk.cyan('===================='));
+    console.log(chalk.cyan.bold(step));
+    console.log(chalk.cyan('====================\n'));
 };
 
-function setupTailwindCSS(packageManager, frontendPath ) {
-    logStep('Setting up Tailwind CSS');
+function setupTailwindCSS(packageManager, frontendPath) {
+    return new Promise(function(resolve, reject) {
+        logStep('Setting up ' + chalk.blue('Tailwind CSS'));
 
-    console.log('Installing Tailwind CSS');
-    execSync(packageManager + ' install -D tailwindcss postcss autoprefixer', { cwd: frontendPath, stdio: 'inherit' });
-    execSync((packageManager === 'npm' ? 'npx' : '') + ' tailwindcss init -p', { cwd: frontendPath, stdio: 'inherit' });
+        var spinner = ora('Installing Tailwind CSS').start();
+        execSync(packageManager + ' install -D tailwindcss postcss autoprefixer', { cwd: frontendPath, stdio: 'ignore' });
+        execSync((packageManager === 'npm' ? 'npx' : '') + ' tailwindcss init -p', { cwd: frontendPath, stdio: 'ignore' });
+        spinner.succeed(chalk.green('Tailwind CSS installed successfully'));
 
+        var tailwindConfig = [
+            '/** @type {import(\'tailwindcss\').Config} */',
+            'module.exports = {',
+            '  content: [',
+            '    "./index.html",',
+            '    "./src/**/*.{js,ts,jsx,tsx}",',
+            '  ],',
+            '  theme: {',
+            '    extend: {},',
+            '  },',
+            '  plugins: [],',
+            '}'
+        ].join('\n');
 
+        spinner = ora('Writing Tailwind config').start();
+        fs.writeFile(path.join(frontendPath, 'tailwind.config.js'), tailwindConfig)
+            .then(function() {
+                spinner.succeed(chalk.green('Tailwind config written successfully'));
 
-    var tailwindConfig = [
-        '/** @type {import(\'tailwindcss\').Config} */',
-        'module.exports = {',
-        '  content: [',
-        '    "./index.html",',
-        '    "./src/**/*.{js,ts,jsx,tsx}",',
-        '  ],',
-        '  theme: {',
-        '    extend: {},',
-        '  },',
-        '  plugins: [],',
-        '}'
-    ].join('\n');
+                var indexCssPath = path.join(frontendPath, 'src', 'index.css');
+                var tailwindDirectives = [
+                    '@tailwind base;',
+                    '@tailwind components;',
+                    '@tailwind utilities;',
+                    ''
+                ].join('\n');
 
-    console.log('Writing Tailwind config');
-    return fs.writeFile(path.join(frontendPath, 'tailwind.config.js'), tailwindConfig)
-        .then(function() {
-            var indexCssPath = path.join(frontendPath, 'src', 'index.css');
-            var tailwindDirectives = [
-                '@tailwind base;',
-                '@tailwind components;',
-                '@tailwind utilities;',
-                ''
-            ].join('\n');
-
-            console.log('Updating index.css');
-            return fs.readFile(indexCssPath, 'utf8')
-                .then(function(existingCss) {
-                    return fs.writeFile(indexCssPath, tailwindDirectives + existingCss);
-                });
-        });
+                spinner = ora('Updating index.css').start();
+                return fs.readFile(indexCssPath, 'utf8')
+                    .then(function(existingCss) {
+                        return fs.writeFile(indexCssPath, tailwindDirectives + existingCss);
+                    });
+            })
+            .then(function() {
+                spinner.succeed(chalk.green('index.css updated successfully'));
+                console.log(chalk.bold.blue('\n✨ Tailwind CSS setup complete! ✨'));
+                resolve();
+            })
+            .catch(function(error) {
+                spinner.fail(chalk.red('Error setting up Tailwind CSS'));
+                console.error(chalk.red('Error details:'), error);
+                reject(error);
+            });
+    });
 }
 
-module.exports = { setupTailwindCSS };
+module.exports = { setupTailwindCSS: setupTailwindCSS };

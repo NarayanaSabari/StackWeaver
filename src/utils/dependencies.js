@@ -5,7 +5,8 @@ const getDependencies = (options) => {
       'mongoose',
       'dotenv',
       'cors',
-      'module-alias'
+      'module-alias',
+      'nodemon'
     ],
     frontend: {
       dependencies: [],
