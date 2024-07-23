@@ -9,8 +9,7 @@ const createProjectStructure = async (projectPath) => {
   const dirs = [
     'backend',
     'frontend',
-    'frontend/public',
-    'frontend/src'
+
   ];
 
   for (const dir of dirs) {

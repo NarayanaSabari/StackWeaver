@@ -32,12 +32,12 @@ const promptForFramework = async () => {
 
 const createViteProject = (packageManager, frontendPath, framework) => {
   const commands = {
-    npm: `npm create vite@latest ${frontendPath} -- --template ${framework}`,
-    yarn: `yarn create vite ${frontendPath} --template ${framework}`,
-    pnpm: `pnpm create vite ${frontendPath} --template ${framework}`,
-    bun: `bun create vite ${frontendPath} --template ${framework}`
+    npm: `npm create vite@latest frontend -- --template ${framework}`,
+    yarn: `yarn create vite frontend --template ${framework}`,
+    pnpm: `pnpm create vite frontend --template ${framework}`,
+    bun: `bun create vite frontend --template ${framework}`
   };
-  execSync(commands[packageManager], { stdio: 'inherit' });
+  execSync(commands[packageManager], { cwd: frontendPath, stdio: 'inherit' });
 };
 
 const installDependencies = (packageManager, frontendPath, dependencies, devDependencies) => {
@@ -62,14 +62,14 @@ const installDependencies = (packageManager, frontendPath, dependencies, devDepe
 
 const setupTailwindAndDaisyUI = async (packageManager, frontendPath, useDaisyUI) => {
   console.log('Setting up Tailwind CSS and DaisyUI...');
-  
+
   // Install Tailwind CSS
-  execSync(`${packageManager} add -D tailwindcss postcss autoprefixer`, { cwd: frontendPath, stdio: 'inherit' });
-  execSync(`${packageManager} ${packageManager === 'npm' ? 'run' : ''} tailwindcss init -p`, { cwd: frontendPath, stdio: 'inherit' });
+  execSync(`${packageManager} install -D tailwindcss postcss autoprefixer`, { cwd: frontendPath, stdio: 'inherit' });
+  execSync(` ${packageManager === 'npm' ? 'npx' : ''} tailwindcss init -p`, { cwd: frontendPath, stdio: 'inherit' });
 
   // Install DaisyUI if selected
   if (useDaisyUI) {
-    execSync(`${packageManager} add -D daisyui@latest`, { cwd: frontendPath, stdio: 'inherit' });
+    execSync(`${packageManager} install -D daisyui@latest`, { cwd: frontendPath, stdio: 'inherit' });
   }
 
   const tailwindConfig = `
@@ -215,7 +215,7 @@ export default defineConfig({
 };
 
 const generateFrontend = async (projectPath, options) => {
-  const frontendPath = path.join(projectPath, 'frontend');
+  let frontendPath = path.join(projectPath, '');
   await fs.ensureDir(frontendPath);
 
   console.log('Setting up Vite for the frontend...');
@@ -226,7 +226,7 @@ const generateFrontend = async (projectPath, options) => {
   console.log('Vite setup complete. Installing additional dependencies...');
 
   const { dependencies, devDependencies } = getDependencies(options).frontend;
-
+  frontendPath = path.join(projectPath, 'frontend');
   if (options.useTailwind || options.useDaisyUI) {
     await setupTailwindAndDaisyUI(packageManager, frontendPath, options.useDaisyUI);
   }

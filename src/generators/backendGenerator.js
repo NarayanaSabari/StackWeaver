@@ -57,6 +57,6 @@ const generateBackend = async (projectPath, options) => {
 // `;
 //     await fs.writeFile(path.join(backendPath, 'graphql.js'), graphqlSetup);
 //   }
-// };
+};
 
-module.exports = { generateBackend };
+module.exports = { generateBackend }

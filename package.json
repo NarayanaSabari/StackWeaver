@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "description": "StackWeaver is an innovative CLI tool designed to streamline the initial setup of full-stack MERN applications.",
   "main": "index.js",
-    "bin": {
+  "bin": {
     "stackweaver": "./bin/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-   "keywords": ["mern", "react", "express", "mongodb", "nodejs", "generator"],
+  "keywords": [
+    "mern",
+    "react",
+    "express",
+    "mongodb",
+    "nodejs",
+    "generator"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NarayanaSabari/StackWeaver.git"
@@ -25,5 +32,10 @@
   "bugs": {
     "url": "https://github.com/NarayanaSabari/StackWeaver/issues"
   },
-  "homepage": "https://github.com/NarayanaSabari/StackWeaver#readme"
+  "homepage": "https://github.com/NarayanaSabari/StackWeaver#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.6"
+  }
 }
