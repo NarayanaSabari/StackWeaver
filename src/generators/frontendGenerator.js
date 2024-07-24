@@ -1,122 +1,123 @@
-var path = require('path');
-var fs = require('fs-extra');
-var execSync = require('child_process').execSync;
-var inquirer = require('inquirer');
-var getDependencies = require('../utils/dependencies').getDependencies;
-var setupTailwindCSS = require('../templates/extras/setupTailwindcss').setupTailwindCSS;
-var setupDaisyUi = require('../templates/extras/setupDaisyUi').setupDaisyUi;
-var setupShadcn = require('../templates/extras/setupShadcn').setupShadcn;
-var chalk = require('chalk');
-var ora = require('ora');
+const path = require('path');
+const fs = require('fs-extra');
+const execSync = require('child_process').execSync;
+const inquirer = require('inquirer');
+const getDependencies = require('../utils/dependencies').getDependencies;
+const setupTailwindCSS = require('../templates/extras/setupTailwindcss').setupTailwindCSS;
+const setupDaisyUi = require('../templates/extras/setupDaisyUi').setupDaisyUi;
+const setupShadcn = require('../templates/extras/setupShadcn').setupShadcn;
+const chalk = require('chalk');
+const ora = require('ora');
 
-var logStep = function(step) {
-    console.log('\n' + chalk.cyan('===================='));
-    console.log(chalk.cyan.bold(step));
-    console.log(chalk.cyan('====================\n'));
+const logStep = (step) => {
+  console.log('\n' + chalk.cyan('===================='));
+  console.log(chalk.cyan.bold(step));
+  console.log(chalk.cyan('====================\n'));
 };
 
-var prompt = function(message, choices, defaultChoice) {
-    return inquirer.prompt([{
-        type: 'list',
-        name: 'choice',
-        message: chalk.blue('Select a ' + message.toLowerCase() + ':'),
-        choices: choices,
-        default: defaultChoice
-    }]).then(function(answers) {
-        console.log(chalk.green('Selected ' + message.toLowerCase() + ':'), chalk.yellow(answers.choice));
-        return answers.choice;
-    });
+const prompt = (message, choices, defaultChoice) => {
+  return inquirer.prompt([{
+    type: 'list',
+    name: 'choice',
+    message: chalk.blue('Select a ' + message.toLowerCase() + ':'),
+    choices: choices,
+    default: defaultChoice
+  }]).then((answers) => {
+    console.log(chalk.green('Selected ' + message.toLowerCase() + ':'), chalk.yellow(answers.choice));
+    return answers.choice;
+  });
 };
 
-var createViteProject = function(packageManager, frontendPath, framework) {
-    logStep('Creating Vite Project');
-    var commands = {
-        npm: 'npm create vite@latest frontend -- --template ' + framework,
-        yarn: 'yarn create vite frontend --template ' + framework,
-        pnpm: 'pnpm create vite frontend --template ' + framework,
-        bun: 'bun create vite frontend --template ' + framework
+const createViteProject = (packageManager, frontendPath, framework) => {
+  logStep('Creating Vite Project');
+  const commands = {
+    npm: 'npm create vite@latest frontend -- --template ' + framework,
+    yarn: 'yarn create vite frontend --template ' + framework,
+    pnpm: 'pnpm create vite frontend --template ' + framework,
+    bun: 'bun create vite frontend --template ' + framework
+  };
+  console.log(chalk.blue('Executing command:'), chalk.yellow(commands[packageManager]));
+  execSync(commands[packageManager], { cwd: frontendPath, stdio: 'pipe' });
+};
+
+const installDependencies = (packageManager, frontendPath, dependencies, devDependencies) => {
+  logStep('Installing Dependencies');
+
+  const installCommand = (deps, dev) => {
+    const flag = dev ? '-D' : '';
+    const commands = {
+      npm: 'npm install ' + flag + ' ' + deps.join(' '),
+      yarn: 'yarn add ' + flag + ' ' + deps.join(' '),
+      pnpm: 'pnpm add ' + flag + ' ' + deps.join(' '),
+      bun: 'bun add ' + flag + ' ' + deps.join(' ')
     };
-    console.log(chalk.blue('Executing command:'), chalk.yellow(commands[packageManager]));
-    execSync(commands[packageManager], { cwd: frontendPath, stdio: 'pipe' });
+    return commands[packageManager];
+  };
+
+  const spinner = ora('Installing dependencies...').start();
+  if (dependencies.length > 0) {
+    spinner.text = 'Installing dependencies: ' + dependencies.join(', ');
+    execSync(installCommand(dependencies), { cwd: frontendPath, stdio: 'pipe' });
+  }
+  if (devDependencies.length > 0) {
+    spinner.text = 'Installing dev dependencies: ' + devDependencies.join(', ');
+    execSync(installCommand(devDependencies, true), { cwd: frontendPath, stdio: 'pipe' });
+  }
+  spinner.succeed(chalk.green('Dependencies installed successfully'));
 };
 
-var installDependencies = function(packageManager, frontendPath, dependencies, devDependencies) {
-    logStep('Installing Dependencies');
+const generateFrontend = (projectPath, options) => {
+  return new Promise((resolve, reject) => {
+    logStep('Generating Frontend');
+    console.log(chalk.blue('Project Path:'), chalk.yellow(projectPath));
 
-    var installCommand = function(deps, dev) {
-        var flag = dev ? '-D' : '';
-        var commands = {
-            npm: 'npm install ' + flag + ' ' + deps.join(' '),
-            yarn: 'yarn add ' + flag + ' ' + deps.join(' '),
-            pnpm: 'pnpm add ' + flag + ' ' + deps.join(' '),
-            bun: 'bun add ' + flag + ' ' + deps.join(' ')
+    const frontendPath = path.join(projectPath, 'frontend');
+    
+    fs.ensureDir(frontendPath)
+      .then(() => prompt('Package Manager', ['npm', 'yarn', 'pnpm', 'bun'], 'npm'))
+      .then((packageManager) => prompt('Framework', ['react', 'react-ts', 'vue', 'vue-ts', 'preact', 'preact-ts', 'lit', 'lit-ts', 'svelte', 'svelte-ts'], 'react')
+        .then((framework) => ({ packageManager, framework }))
+      )
+      .then((result) => {
+        const { packageManager, framework } = result;
+        
+        const commands = {
+          npm: `npm create vite@latest . -- --template ${framework}`,
+          yarn: `yarn create vite . --template ${framework}`,
+          pnpm: `pnpm create vite . --template ${framework}`,
+          bun: `bun create vite . --template ${framework}`
         };
-        return commands[packageManager];
-    };
 
-    var spinner = ora('Installing dependencies...').start();
-    if (dependencies.length > 0) {
-        spinner.text = 'Installing dependencies: ' + dependencies.join(', ');
-        execSync(installCommand(dependencies), { cwd: frontendPath, stdio: 'pipe' });
-    }
-    if (devDependencies.length > 0) {
-        spinner.text = 'Installing dev dependencies: ' + devDependencies.join(', ');
-        execSync(installCommand(devDependencies, true), { cwd: frontendPath, stdio: 'pipe' });
-    }
-    spinner.succeed(chalk.green('Dependencies installed successfully'));
+        console.log(chalk.blue('Executing command:'), chalk.yellow(commands[packageManager]));
+        execSync(commands[packageManager], { cwd: frontendPath, stdio: 'inherit' });
+
+        const deps = getDependencies(options).frontend;
+        const promises = [];
+
+        if (options.useTailwind) {
+          if (options.uiLibrary === 'daisyui') {
+            promises.push(setupDaisyUi(packageManager, frontendPath, options.uiLibrary));
+          } else if (options.uiLibrary === 'shadcn') {
+            promises.push(setupShadcn(packageManager, frontendPath, framework));
+          } else {
+            promises.push(setupTailwindCSS(packageManager, frontendPath));
+          }
+        } else if (options.uiLibrary === 'daisyui' || options.uiLibrary === 'shadcn') {
+          const setupFunction = options.uiLibrary === 'daisyui' ? setupDaisyUi : setupShadcn;
+          promises.push(setupFunction(packageManager, frontendPath));
+        }
+
+        return Promise.all(promises).then(() => {
+          installDependencies(packageManager, frontendPath, deps.dependencies, deps.devDependencies);
+          console.log(chalk.green.bold('\n✨ Frontend setup complete! ✨'));
+          resolve();
+        });
+      })
+      .catch((error) => {
+        console.error(chalk.red('An error occurred:'), error);
+        reject(error);
+      });
+  });
 };
 
-var generateFrontend = function(projectPath, options) {
-    return new Promise(function(resolve, reject) {
-        logStep('Generating Frontend');
-        console.log(chalk.blue('Project Path:'), chalk.yellow(projectPath))
-
-        var frontendPath = path.join(projectPath, '');
-        fs.ensureDir(frontendPath)
-            .then(function() {
-                return prompt('Package Manager', ['npm', 'yarn', 'pnpm', 'bun'], 'npm');
-            })
-            .then(function(packageManager) {
-                return prompt('Framework', ['react', 'react-ts', 'vue', 'vue-ts', 'preact', 'preact-ts', 'lit', 'lit-ts', 'svelte', 'svelte-ts'], 'react')
-                    .then(function(framework) {
-                        return { packageManager: packageManager, framework: framework };
-                    });
-            })
-            .then(function(result) {
-                var packageManager = result.packageManager;
-                var framework = result.framework;
-                var isTypeScript = framework.endsWith('-ts');
-
-                createViteProject(packageManager, frontendPath, framework);
-
-                var deps = getDependencies(options).frontend;
-                var promises = [];
-                frontendPath = path.join(projectPath, 'frontend');
-
-                if (options.useTailwind) {
-                    if (options.uiLibrary === 'daisyui') {
-                        promises.push(setupDaisyUi(packageManager, frontendPath, options.uiLibrary));
-                    } else if (options.uiLibrary === 'shadcn') {
-                        promises.push(setupShadcn(packageManager, frontendPath, isTypeScript, framework));
-                    } else {
-                        promises.push(setupTailwindCSS(packageManager, frontendPath));
-                    }
-                } else if (options.uiLibrary === 'daisyui' || options.uiLibrary === 'shadcn') {
-                    var setupFunction = options.uiLibrary === 'daisyui' ? setupDaisyUi : setupShadcn;
-                    promises.push(setupFunction(packageManager, frontendPath, options.uiLibrary === 'shadcn' ? isTypeScript : options.uiLibrary));
-                }
-
-                return Promise.all(promises).then(function() {
-                    installDependencies(packageManager, frontendPath, deps.dependencies, deps.devDependencies);
-                    console.log(chalk.green.bold('\n✨ Frontend setup complete! ✨'));
-                    resolve();
-                });
-            })
-            .catch(function(error) {
-                console.error(chalk.red('An error occurred:'), error);
-                reject(error);
-            });
-    });
-};
-
-module.exports = { generateFrontend: generateFrontend };
+module.exports = { generateFrontend };

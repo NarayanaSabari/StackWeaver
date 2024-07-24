@@ -1,62 +1,55 @@
 const path = require('path');
 const fs = require('fs-extra');
-const { copyTemplateFiles } = require('../utils/fileOperations');
+const execSync = require('child_process').execSync;
+const { copyTemplateFiles } = require('../utils/fileOperations'); 
 const { getDependencies } = require('../utils/dependencies');
 
 const generateBackend = async (projectPath, options) => {
-  const backendPath = path.join(projectPath, 'backend');
-  const templatePath = path.join(__dirname, '../templates/backend');
+  try {
+    const backendPath = path.join(projectPath, 'backend');
+    const templatePath = path.join(__dirname, '../templates/backend');
 
-  await copyTemplateFiles(templatePath, backendPath);
+    console.log('Copying backend template files...');
+    await fs.ensureDir(backendPath);
+    await copyTemplateFiles(templatePath, backendPath); 
 
-  const packageJson = {
-    name: `${options.projectName}-backend`,
-    version: '1.0.0',
-    main: 'server.js',
-    scripts: {
-      start: 'node ./src/server.js',
-      dev: "nodemon ./src/server.js"
-    },
-    _moduleAliases: {
-    "@": "./src/",
-    "@controllers": "./src/controllers/",
-    "@config": "./src/config/",
-    "@routes": "./src/routes/",
-    "@middleware": "./src/middleware/",
-    "@mongodb": "./src/modules/mongodb",
-    "@utils": "./src/utils",
-    "@services": "./src/services"
-  },
-    dependencies: {}
-    
-  };
+    const packageJson = {
+      name: `${options.projectName}-backend`,
+      version: '1.0.0',
+      main: 'server.js',
+      scripts: {
+        start: 'node ./src/server.js',
+        dev: 'nodemon ./src/server.js'
+      },
+      _moduleAliases: {
+        "@": "./src/",
+        "@controllers": "./src/controllers/",
+        "@config": "./src/config/",
+        "@routes": "./src/routes/",
+        "@middleware": "./src/middleware/",
+        "@mongodb": "./src/modules/mongodb",
+        "@utils": "./src/utils/",
+        "@services": "./src/services/"
+      },
+      dependencies: {}
+    };
 
-  const dependencies = getDependencies(options).backend;
-  for (const dep of dependencies) {
-    packageJson.dependencies[dep] = '*';
+    const dependencies = getDependencies(options).backend;
+    for (const dep of dependencies) {
+      packageJson.dependencies[dep] = '*';
+    }
+
+    console.log('Writing package.json...');
+    await fs.writeJson(path.join(backendPath, 'package.json'), packageJson, { spaces: 2 });
+
+    console.log('Installing backend dependencies...');
+    execSync('npm install', { cwd: backendPath, stdio: 'inherit' });
+
+    console.log('Backend generation complete!');
+  } catch (error) {
+    console.error('Error generating backend:', error);
+    throw error;
   }
-
-  await fs.writeJson(path.join(backendPath, 'package.json'), packageJson, { spaces: 2 });
-
-//   if (options.useGraphQL) {
-//     // Add GraphQL schema and resolvers
-//     const graphqlSetup = `
-// const { buildSchema } = require('graphql');
-
-// const schema = buildSchema(\`
-//   type Query {
-//     hello: String
-//   }
-// \`);
-
-// const root = {
-//   hello: () => 'Hello, GraphQL!'
-// };
-
-// module.exports = { schema, root };
-// `;
-//     await fs.writeFile(path.join(backendPath, 'graphql.js'), graphqlSetup);
-//   }
 };
 
-module.exports = { generateBackend }
+module.exports = { generateBackend };
