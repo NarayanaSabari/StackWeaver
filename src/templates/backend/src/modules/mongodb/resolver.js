@@ -1,0 +1,1 @@
+const { UserModel } = require('./schema');

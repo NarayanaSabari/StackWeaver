@@ -6,7 +6,6 @@ const generateBackend = require('./backendGenerator').generateBackend;
 const generateFrontend = require('./frontendGenerator').generateFrontend;
 const { createProjectStructure } = require('../utils/fileOperations'); 
 
-
 const generateProject = function(options) {
   return new Promise(function(resolve, reject) {
     const projectPath = path.join(process.cwd(), options.projectName);
@@ -71,3 +70,4 @@ const generateProject = function(options) {
 };
 
 module.exports = { generateProject };
+
