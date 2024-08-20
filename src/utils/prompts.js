@@ -6,10 +6,22 @@ const getPrompts = () => [
     default: 'my-mern-app'
   },
   {
+    type: 'list',
+    name: 'projectType',
+    message: 'What do you want to generate?',
+    choices: [
+      { name: 'Complete Project', value: 'complete' },
+      { name: 'Backend Only', value: 'backend' },
+      { name: 'Frontend Only', value: 'frontend' }
+    ],
+    default: 'complete'
+  },
+  {
     type: 'confirm',
     name: 'useTailwind',
     message: 'Do you want to use Tailwind CSS?',
-    default: false
+    default: false,
+    when: (answers) => answers.projectType !== 'backend'
   },
   {
     type: 'list',
@@ -20,7 +32,8 @@ const getPrompts = () => [
       { name: 'Shadcn UI', value: 'shadcn' },
       { name: 'DaisyUI', value: 'daisyui' }
     ],
-    default: 'none'
+    default: 'none',
+    when: (answers) => answers.projectType !== 'backend' && answers.useTailwind
   }
 ];
 
