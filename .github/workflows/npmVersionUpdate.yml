@@ -1,0 +1,46 @@
+name: Release on PR Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'future-branch'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        registry-url: 'https://registry.npmjs.org/'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Update package version
+      run: |
+        NEW_VERSION=$(npm version patch --no-git-tag-version)
+        echo "New version: $NEW_VERSION"
+
+    - name: Commit updated version
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "GitHub Actions"
+        git add package.json
+        git commit -m "ci: Bump version to $NEW_VERSION"
+
+    - name: Push changes to main
+      run: git push origin main
+
+    - name: Publish to npm
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
