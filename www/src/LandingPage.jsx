@@ -83,19 +83,19 @@ const LandingPage = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <TestimonialCard
-              quote="Stackweaver cut my project setup time from hours to minutes. It's an absolute game-changer for my team's productivity."
-              author="Sarah L., Senior Full-stack Developer"
-              company="TechInnovate Inc."
+              quote="Stackweaver cut my project setup time from hours to minutes. It's an absolute game-changer for my productivity."
+              author="Mugilan, Full-stack Developer"
+
             />
             <TestimonialCard
-              quote="The TypeScript integration and pre-configured testing setup have significantly reduced our bug count. Stackweaver is now an essential part of our development workflow."
-              author="Mike R., Tech Lead"
-              company="WebSolutions Co."
+              quote="StackWeaver saved me hours by quickly setting up my MERN stack projects with Tailwind CSS and ShadCN UI. It’s a game-changer!"
+              author="Kavin, Full-stack Developer"
+
             />
             <TestimonialCard
-              quote="As a frontend specialist, I love how Stackweaver handles all the backend setup. It lets me focus on creating great user experiences without worrying about server configuration."
-              author="Emily C., UI/UX Developer"
-              company="DesignMasters LLC"
+              quote="StackWeaver takes the hassle out of project setup. It’s intuitive and lets me focus on coding rather than configuration."
+              author="Melvin, Full-stack Developer"
+
             />
           </div>
         </section>
@@ -108,10 +108,10 @@ const LandingPage = () => {
             extraordinary MERN stack applications.
           </p>
           <div className="flex justify-center space-x-4">
-            <a href="#" className="text-gray-400 hover:text-white">
+            <a href="https://github.com/NarayanaSabari/StackWeaver" className="text-gray-400 hover:text-white">
               GitHub
             </a>
-            <a href="#" className="text-gray-400 hover:text-white">
+            <a href="https://www.npmjs.com/package/stackweaver" className="text-gray-400 hover:text-white">
               npm
             </a>
           
